@@ -78,7 +78,8 @@ async function formatChatData(k, userID) {
     recipientName: user1.name,
     profilePicture: user1.profilePicture,
     conversation: k.Messages,
-    recipientID: user1._id,
+    // recipientID: user1._id,
+    lastInChat: k.lastInChat,
   };
 }
 
@@ -105,6 +106,7 @@ io.on("connection", (socket) => {
         isOffer: true,
         offerID: newOffer.offerID,
         message: "sent an offer",
+        timestamp: newOffer.timestamp,
       },
     });
     socket.broadcast.emit("newOffer", {
@@ -114,6 +116,7 @@ io.on("connection", (socket) => {
         isOffer: true,
         offerID: newOffer.offerID,
         message: "sent an offer",
+        timestamp: newOffer.timestamp,
       },
     });
   });
@@ -122,7 +125,30 @@ io.on("connection", (socket) => {
     socket.emit("dealUpdated", offerID);
     socket.broadcast.emit("dealUpdated", offerID);
   });
+
+  socket.on("lastInChat", async (lastInChat) => {
+    console.log("lastInChat");
+    await handleLastInChat(lastInChat);
+    socket.emit("lastInChat", lastInChat);
+    socket.broadcast.emit("lastInChat", lastInChat);
+  });
 });
+
+async function handleLastInChat(lastInChat) {
+  try {
+    const chat = await ChatData.findByIdAndUpdate(
+      lastInChat.chatID,
+      {
+        $set: {
+          [`lastInChat.${lastInChat.senderID}`]: lastInChat.lastInChat,
+        },
+      },
+      { new: true }
+    );
+  } catch (error) {
+    console.error("Error handling handleLastInChat:", error);
+  }
+}
 
 async function handleNewOffer(newOffer) {
   try {

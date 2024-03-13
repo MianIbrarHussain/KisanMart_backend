@@ -22,13 +22,11 @@ Router.post("/createChatRoom", async (req, res) => {
       } else {
         const chat = await ChatData.create({
           recipients: [req.body.userID, req.body.recipientID],
-          Messages: [
-            // {
-            //   sender: req.body.userID,
-            //   isOffer: false,
-            //   message: "Hello!",
-            // },
-          ],
+          Messages: [],
+          lastInChat: {
+            [`${req.body.userID}`]: new Date(),
+            [`${req.body.recipientID}`]: new Date(),
+          },
         });
         if (chat) {
           res.status(200).json({

@@ -54,6 +54,7 @@ const Chats = mongo.Schema(
         timestamp: Date,
       },
     ],
+    lastInChat: {},
   },
   { timestamps: true }
 );
