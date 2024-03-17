@@ -45,36 +45,65 @@ Router.get("/getDealDetails/:offerID/:userID", async (req, res) => {
     const offerID = req.params.offerID;
     const userID = req.params.userID;
     let offerData = await DealsData.findById(offerID);
-    let productData = await ProductsData.findById(offerData.productID);
     const user =
       offerData.sellerID === userID ? offerData.buyerID : offerData.sellerID;
     let userData = await UserData.findById(user);
-    res.status(200).send({
-      success: true,
-      data: {
-        product: {
-          productName: productData.productName,
-          productImages: productData.productImages,
-          description: productData.description,
+    let productData = await ProductsData.findById(offerData.productID);
+    if (productData) {
+      return res.status(200).send({
+        success: true,
+        data: {
+          product: {
+            productName: productData.productName,
+            productImages: productData.productImages,
+            description: productData.description,
+          },
+          user: {
+            profilePicture: userData.profilePicture,
+            name: userData.name,
+            phone: userData.phone,
+            whatsapp: userData.whatsapp,
+            city: userData.city,
+            isSeller: offerData.sellerID === userID ? false : true,
+          },
+          offer: {
+            requiredQuantity: offerData.requiredQuantity,
+            offeredPrice: offerData.offeredPrice,
+            terms: offerData.terms,
+            estimatedDate: offerData.estimatedDate,
+            status: offerData.status,
+            offerID: offerData._id,
+          },
         },
-        user: {
-          profilePicture: userData.profilePicture,
-          name: userData.name,
-          phone: userData.phone,
-          whatsapp: userData.whatsapp,
-          city: userData.city,
-          isSeller: offerData.sellerID === userID ? false : true,
+      });
+    } else {
+      return res.status(200).send({
+        success: true,
+        data: {
+          product: {
+            productName: "User may have deleted this product",
+            productImages: [],
+            description: "N/A",
+          },
+          user: {
+            profilePicture: userData.profilePicture,
+            name: userData.name,
+            phone: userData.phone,
+            whatsapp: userData.whatsapp,
+            city: userData.city,
+            isSeller: offerData.sellerID === userID ? false : true,
+          },
+          offer: {
+            requiredQuantity: offerData.requiredQuantity,
+            offeredPrice: offerData.offeredPrice,
+            terms: offerData.terms,
+            estimatedDate: offerData.estimatedDate,
+            status: offerData.status,
+            offerID: offerData._id,
+          },
         },
-        offer: {
-          requiredQuantity: offerData.requiredQuantity,
-          offeredPrice: offerData.offeredPrice,
-          terms: offerData.terms,
-          estimatedDate: offerData.estimatedDate,
-          status: offerData.status,
-          offerID: offerData._id,
-        },
-      },
-    });
+      });
+    }
   } catch (error) {
     console.log(error);
     return res.status(500).send("Internal Server Error!");

@@ -233,4 +233,20 @@ Router.post("/getSupplierProducts", async (req, res) => {
   }
 });
 
+Router.delete("/DeleteProduct/:productID", async (req, res) => {
+  try {
+    const productID = req.params.productID;
+    const product = await ProductsData.findByIdAndDelete(productID);
+    if (product) {
+      return res.status(200).send({
+        success: true,
+        message: "Product has been deleted...",
+      });
+    }
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Internal Server Error!");
+  }
+});
+
 module.exports = Router;
