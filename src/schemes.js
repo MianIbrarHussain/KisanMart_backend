@@ -40,6 +40,14 @@ const UserRegistration = mongo.Schema({
     unique: true,
     sparse: true,
   },
+  cnicFront: {
+    type: String,
+    required: false,
+  },
+  cnicBack: {
+    type: String,
+    required: false,
+  },
 });
 
 const Chats = mongo.Schema(
